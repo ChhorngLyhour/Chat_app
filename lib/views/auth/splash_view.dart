@@ -32,7 +32,7 @@ class _SplashViewState extends State<SplashView>
     );
     _animationController.forward();
 
-     _checkAuthAndNavigate();
+    _checkAuthAndNavigate();
     // will implement check if logged in auth controller in upcoming videos
   }
 
@@ -45,7 +45,8 @@ class _SplashViewState extends State<SplashView>
 
     if (authController.isAuthenticated) {
       Get.offAllNamed(AppRoutes.main);
-    }else{
+      // for now we don't have main screen
+    } else {
       Get.offAllNamed(AppRoutes.login);
     }
   }
@@ -66,57 +67,56 @@ class _SplashViewState extends State<SplashView>
           animation: _animationController,
           builder: (context, child) {
             return FadeTransition(
-            opacity: _fadeAnimation,
-            child: ScaleTransition(
-            scale: _scaleAnimation, 
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 20,
-                      offset: Offset(0, 10),
+              opacity: _fadeAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.chat_bubble_rounded,
+                        size: 60,
+                        color: AppTheme.primaryColor,
+                      ),
                     ),
-                    
+                    SizedBox(height: 32),
+                    Text(
+                      "ChatAPP",
+                      style: Theme.of(context).textTheme.headlineLarge
+                          ?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    SizedBox(height: 32),
+                    Text(
+                      "Connec with Friends Instantly",
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                    ),
+                    SizedBox(height: 64),
+                    CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
                   ],
                 ),
-                child: Icon(
-                  Icons.chat_bubble_rounded,
-                  size: 60,
-                  color: AppTheme.primaryColor,
-                  ),
-
-                ),
-                SizedBox(height: 32),
-                Text("ChatAPP",
-                style: Theme.of(context).textTheme.headlineLarge
-                ?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold
-                ),
-                ),
-                SizedBox(height: 32,),
-                Text("Connec with Friends Instantly",
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.white.withOpacity(0.8),
-                ),
-                ),
-                SizedBox(height: 64),
-                CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-
-              ],
-
               ),
-             ),
             );
           },
         ),

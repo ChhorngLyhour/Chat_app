@@ -84,7 +84,6 @@ class AuthController extends GetxController {
       _isLoading.value = true;
       _error.value = '';
 
-      // ✅ FIXED: call method directly from _authService
       UserModel? userModel = await _authService.registerWithEmailAndPassword(
         email,
         password,

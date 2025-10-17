@@ -9,10 +9,10 @@ class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
 
   @override
-  State<RegisterView> createState() => _RegisterView();
+  State<RegisterView> createState() => _RegisterViewState();
 }
 
-class _RegisterView extends State<RegisterView> {
+class _RegisterViewState extends State<RegisterView> {
   final _formKey = GlobalKey<FormState>();
   final _displayNameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -45,11 +45,12 @@ class _RegisterView extends State<RegisterView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 20),
-                
+
                 Row(
                   children: [
-                    IconButton(onPressed: () => Get.back(),
-                    icon: Icon(Icons.arrow_back),
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: Icon(Icons.arrow_back),
                     ),
                     Text(
                       "Create Account",
@@ -67,15 +68,34 @@ class _RegisterView extends State<RegisterView> {
                 SizedBox(height: 40),
                 TextFormField(
                   controller: _displayNameController,
-                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     labelText: 'Display Name',
-                    prefixIcon: Icon(Icons.email_outlined),
+                    prefixIcon: Icon(Icons.person_outline),
                     hintText: 'Enter your Name',
                   ),
                   validator: (value) {
                     if (value?.isEmpty ?? true) {
                       return 'Please enter your Name';
+                    }
+                    return null;
+                  },
+                ),
+
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    prefixIcon: Icon(Icons.email_outlined),
+                    hintText: 'Enter your email',
+                  ),
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) {
+                      return 'Please enter your email';
+                    }
+                    if (!GetUtils.isEmail(value!)) {
+                      return 'Please enter a valid email';
                     }
                     return null;
                   },
@@ -112,6 +132,39 @@ class _RegisterView extends State<RegisterView> {
                     return null;
                   },
                 ),
+
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: _comfirmPasswordController,
+                  obscureText: _obsecureComfirmPassword,
+                  decoration: InputDecoration(
+                    labelText: 'Comfirm Password',
+                    prefixIcon: Icon(Icons.lock_outlined),
+                    hintText: 'Comfirm your Password',
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obsecureComfirmPassword
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obsecureComfirmPassword = !_obsecureComfirmPassword;
+                        });
+                      },
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) {
+                      return 'Please comfirm your password';
+                    }
+                    if (value != _passwordController.text) {
+                      return 'Password do not match';
+                    }
+                    return null;
+                  },
+                ),
+
                 SizedBox(height: 24),
                 Obx(
                   () => SizedBox(
@@ -121,9 +174,10 @@ class _RegisterView extends State<RegisterView> {
                           ? null
                           : () {
                               if (_formKey.currentState?.validate() ?? false) {
-                                _authController.signInWithEmailAndPassword(
+                                _authController.registerWithEmailAndPassword(
                                   _emailController.text.trim(),
                                   _passwordController.text,
+                                  _displayNameController.text,
                                 );
                               }
                             },
@@ -136,22 +190,22 @@ class _RegisterView extends State<RegisterView> {
                                 strokeWidth: 2,
                               ),
                             )
-                          : Text("Sign In"),
+                          : Text("Create Account"),
                     ),
                   ),
                 ),
-                SizedBox(height: 16),
-                Center(
-                  child: TextButton(
-                    onPressed: () {
-                      Get.toNamed(AppRoutes.forgotPassword);
-                    },
-                    child: Text(
-                      'Forgot Password',
-                      style: TextStyle(color: AppTheme.primaryColor),
-                    ),
-                  ),
-                ),
+                // SizedBox(height: 16),
+                // Center(
+                //   child: TextButton(
+                //     onPressed: () {
+                //       Get.toNamed(AppRoutes.forgotPassword);
+                //     },
+                //     child: Text(
+                //       'Forgot Password',
+                //       style: TextStyle(color: AppTheme.primaryColor),
+                //     ),
+                //   ),
+                // ),
                 SizedBox(height: 32),
                 Row(
                   children: [
@@ -171,14 +225,14 @@ class _RegisterView extends State<RegisterView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Don't have an account?",
+                      "Already have an account?",
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     SizedBox(width: 12),
                     GestureDetector(
-                      onTap: () => Get.toNamed(AppRoutes.register),
+                      onTap: () => Get.toNamed(AppRoutes.login),
                       child: Text(
-                        'Sign Up',
+                        'Sign In',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppTheme.primaryColor,
                           fontWeight: FontWeight.w600,

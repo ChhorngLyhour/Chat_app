@@ -179,6 +179,7 @@ class _LoginViewState extends State<LoginView> {
                       "Don't have an account?",
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
+                    SizedBox(width: 8),
                     GestureDetector(
                       onTap: () => Get.toNamed(AppRoutes.register),
                       child: Text(
