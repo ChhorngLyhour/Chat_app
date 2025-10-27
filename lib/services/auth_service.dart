@@ -1,7 +1,6 @@
 import 'package:chat_app/models/user_model.dart';
 import 'package:chat_app/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -12,7 +11,7 @@ class AuthService {
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  // ✅ FIXED: allow null return type
+  // Sign In
   Future<UserModel?> signInWithEmailAndPassword(
     String email,
     String password,
@@ -24,16 +23,17 @@ class AuthService {
       );
       User? user = result.user;
       if (user != null) {
+        // Set online status in Firestore
         await _firestoreService.updateUserOnlineStatus(user.uid, true);
         return await _firestoreService.getUser(user.uid);
       }
       return null;
     } catch (e) {
-      throw Exception('Faild To Sing In: ${e.toString()}');
+      throw Exception('Failed To Sign In: ${e.toString()}');
     }
   }
 
-  // ✅ FIXED: allow null return type and return created model
+  // Register
   Future<UserModel?> registerWithEmailAndPassword(
     String email,
     String password,
@@ -47,32 +47,37 @@ class AuthService {
       User? user = result.user;
       if (user != null) {
         await user.updateDisplayName(displayName);
+
+        // Create UserModel with lastSeen and isOnline
         final userModel = UserModel(
           id: user.uid,
+          displayName: displayName,
           email: email,
           photoURL: '',
-          displayName: displayName,
-          lastSeen: DateTime.now(),
-          createAt: DateTime.now(),
           isOnline: true,
+          createAt: DateTime.now(),
+          lastSeen: DateTime.now(),
         );
+
         await _firestoreService.createUser(userModel);
-        return userModel; // ✅ FIXED: return created user
+        return userModel;
       }
       return null;
     } catch (e) {
-      throw Exception('Faild To Sing In: ${e.toString()}');
+      throw Exception('Failed To Register: ${e.toString()}');
     }
   }
 
+  // Password Reset
   Future<void> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } catch (e) {
-      throw Exception('Faild To Send Password Reset Email: ${e.toString()}');
+      throw Exception('Failed To Send Password Reset Email: ${e.toString()}');
     }
   }
 
+  // Sign Out
   Future<void> signOut() async {
     try {
       if (currentUser != null) {
@@ -80,11 +85,12 @@ class AuthService {
       }
       await _auth.signOut();
     } catch (e) {
-      throw Exception('Faild To Sign Out: ${e.toString()}');
+      throw Exception('Failed To Sign Out: ${e.toString()}');
     }
   }
 
-  Future<void> deleteAccunt() async {
+  // Delete Account
+  Future<void> deleteAccount() async {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
@@ -92,7 +98,12 @@ class AuthService {
         await user.delete();
       }
     } catch (e) {
-      throw Exception('Faild To Delete Account: ${e.toString()}');
+      throw Exception('Failed To Delete Account: ${e.toString()}');
     }
+  }
+
+  // ✅ Add this missing method to fix "getUserById" error
+  Future<UserModel?> getUserById(String userId) async {
+    return await _firestoreService.getUser(userId);
   }
 }

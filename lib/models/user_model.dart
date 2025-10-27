@@ -1,66 +1,68 @@
-// ignore_for_file: unnecessary_this, dead_code
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserModel {
   final String id;
-  final String email;
   final String displayName;
+  final String email;
   final String photoURL;
-  final bool inOnline;
-  final DateTime lastSeen;
+  final bool isOnline;
   final DateTime createAt;
+  final DateTime? lastSeen; // ← add this
 
   UserModel({
     required this.id,
-    required this.email,
     required this.displayName,
-    this.photoURL = "",
-    this.inOnline = false,
-    required this.lastSeen,
+    required this.email,
+    required this.photoURL,
+    required this.isOnline,
     required this.createAt,
-    required bool isOnline, // kept it for compatibility, even if unused
+    this.lastSeen, // ← optional
   });
+
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    return UserModel(
+      id: map['id'] ?? '',
+      displayName: map['displayName'] ?? '',
+      email: map['email'] ?? '',
+      photoURL: map['photoURL'] ?? '',
+      isOnline: map['isOnline'] ?? false,
+      createAt: map['createAt'] != null
+          ? (map['createAt'] as Timestamp).toDate()
+          : DateTime.now(),
+      lastSeen: map['lastSeen'] != null
+          ? (map['lastSeen'] as Timestamp).toDate()
+          : null,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'email': email,
       'displayName': displayName,
+      'email': email,
       'photoURL': photoURL,
-      'inOnline': inOnline,
-      'lastSeen': lastSeen.millisecondsSinceEpoch,
-      'createAt': createAt.millisecondsSinceEpoch,
+      'isOnline': isOnline,
+      'createAt': Timestamp.fromDate(createAt),
+      if (lastSeen != null) 'lastSeen': Timestamp.fromDate(lastSeen!),
     };
   }
 
-  static UserModel fromMap(Map<String, dynamic> map) {
-    return UserModel(
-      id: map['id'] ?? '',
-      email: map['email'] ?? '',
-      displayName: map['displayName'] ?? '',
-      photoURL: map['photoURL'] ?? '',
-      isOnline: map['inOnline'] ?? false,
-      lastSeen: DateTime.fromMillisecondsSinceEpoch(map['lastSeen'] ?? 0),
-      createAt: DateTime.fromMillisecondsSinceEpoch(map['createAt'] ?? 0),
-    );
-  }
-
   UserModel copyWith({
-    String? id,
-    String? email,
     String? displayName,
+    String? email,
     String? photoURL,
     bool? isOnline,
+    DateTime? createAt,
     DateTime? lastSeen,
-    DateTime? createdAt,
   }) {
     return UserModel(
-      id: id ?? this.id,
-      email: email ?? this.email,
+      id: id,
       displayName: displayName ?? this.displayName,
+      email: email ?? this.email,
       photoURL: photoURL ?? this.photoURL,
-      isOnline: isOnline ?? this.inOnline,
+      isOnline: isOnline ?? this.isOnline,
+      createAt: createAt ?? this.createAt,
       lastSeen: lastSeen ?? this.lastSeen,
-      createAt: createdAt ?? this.createAt,
     );
   }
 }

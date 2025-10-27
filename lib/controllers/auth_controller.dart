@@ -10,14 +10,14 @@ class AuthController extends GetxController {
   final Rx<UserModel?> _userModel = Rx<UserModel?>(null);
   final RxBool _isLoading = false.obs;
   final RxString _error = ''.obs;
-  final RxBool _isinitialized = false.obs;
+  final RxBool _isInitialized = false.obs;
 
   User? get user => _user.value;
   UserModel? get userModel => _userModel.value;
   bool get isLoading => _isLoading.value;
   String get error => _error.value;
   bool get isAuthenticated => _user.value != null;
-  bool get isinitialized => _isinitialized.value;
+  bool get isInitialized => _isInitialized.value;
 
   @override
   void onInit() {
@@ -32,24 +32,14 @@ class AuthController extends GetxController {
         Get.offAllNamed(AppRoutes.login);
       }
     } else {
-      if (Get.currentRoute != AppRoutes.main) {
-        Get.offAllNamed(AppRoutes.main);
+      // ✅ Always go to profile after login/signup
+      if (Get.currentRoute != AppRoutes.profile) {
+        Get.offAllNamed(AppRoutes.profile);
       }
     }
-    if (!_isinitialized.value) {
-      _isinitialized.value = true;
+    if (!_isInitialized.value) {
+      _isInitialized.value = true;
     }
-  }
-
-  void checkInitialAuthState() {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
-      _user.value = currentUser;
-      Get.offAllNamed(AppRoutes.main);
-    } else {
-      Get.offAllNamed(AppRoutes.login);
-    }
-    _isinitialized.value = true;
   }
 
   Future<void> signInWithEmailAndPassword(String email, String password) async {
@@ -64,11 +54,13 @@ class AuthController extends GetxController {
 
       if (userModel != null) {
         _userModel.value = userModel;
-        Get.offAllNamed(AppRoutes.main);
+
+        // ✅ Go directly to profile
+        Get.offAllNamed(AppRoutes.profile);
       }
     } catch (e) {
       _error.value = e.toString();
-      Get.snackbar('Error', 'Faild To Login');
+      Get.snackbar('Error', 'Failed To Login');
       print(e);
     } finally {
       _isLoading.value = false;
@@ -89,14 +81,16 @@ class AuthController extends GetxController {
         password,
         displayName,
       );
-      
+
       if (userModel != null) {
         _userModel.value = userModel;
-        Get.offAllNamed(AppRoutes.main);
+
+        // ✅ Go directly to profile after register
+        Get.offAllNamed(AppRoutes.profile);
       }
     } catch (e) {
       _error.value = e.toString();
-      Get.snackbar('Error', 'Faild To Create Accout');
+      Get.snackbar('Error', 'Failed To Create Account');
       print(e);
     } finally {
       _isLoading.value = false;
@@ -120,7 +114,7 @@ class AuthController extends GetxController {
   Future<void> deleteAccount() async {
     try {
       _isLoading.value = true;
-      await _authService.deleteAccunt();
+      await _authService.deleteAccount();
       _userModel.value = null;
       Get.offAllNamed(AppRoutes.login);
     } catch (e) {
@@ -129,10 +123,9 @@ class AuthController extends GetxController {
     } finally {
       _isLoading.value = false;
     }
+  }
 
-    // ignore: unused_element
-    void clearError() {
-      _error.value = '';
-    }
+  void clearError() {
+    _error.value = '';
   }
 }

@@ -1,13 +1,9 @@
-// ignore_for_file: unused_import
+import 'package:get/get.dart';
 
-import 'package:get/get_navigation/src/routes/get_route.dart';
-
-// Define your route names
 class AppRoutes {
   static const String splash = '/';
   static const String home = '/home';
   static const String main = '/main';
-
   static const String login = '/login';
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
@@ -19,5 +15,5 @@ class AppRoutes {
   static const String friendRequests = '/friend-requests';
   static const String notifacations = '/notifications';
 
-   static List<GetPage>? get routes => null;
+  static List<GetPage>? get routes => null;
 }
